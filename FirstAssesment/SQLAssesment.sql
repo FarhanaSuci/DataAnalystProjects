@@ -75,13 +75,12 @@ Select * from sales;
 
 -- Dim Location Table
 CREATE TABLE dim_location (
-    location_id INT AUTO_INCREMENT PRIMARY KEY,
-    city VARCHAR(100),
-    state VARCHAR(100),
-    country VARCHAR(100),
-    continent VARCHAR(150),
-    UNIQUE(city, state, country, continent)
+    city VARCHAR(100) PRIMARY KEY,  -- referenced by 'sales.city'
+    state VARCHAR(100) NOT NULL,
+    country VARCHAR(100) NOT NULL,
+    continent VARCHAR(150) NOT NULL
 );
+
 
 -- Dim Category Table
 CREATE TABLE dim_category (
