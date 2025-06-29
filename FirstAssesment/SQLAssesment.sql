@@ -183,6 +183,21 @@ SELECT COUNT(*) FROM sales;
 #Checking null records
 SELECT COUNT(*) FROM sales WHERE Product_ID IS NULL;
 
+CREATE TABLE return_table (
+    Order_ID VARCHAR(100),
+    Returned VARCHAR(10)
+);
+
+
+#Create table for returned.csv
+CREATE TABLE return_table (
+    returned VARCHAR(10),
+    order_id VARCHAR(100)
+);
+
+select * from return_table;
+
+
 
 
 
