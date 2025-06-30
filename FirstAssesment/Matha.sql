@@ -257,10 +257,20 @@ GROUP BY product_id
 HAVING total_profit < 0;
 
 ### 10. Correlation Between Discount and Order Volume
-SELECT discount_perc, SUM(quantity) AS total_quantity
+
+SELECT
+  discount_perc,
+  ROUND(AVG(unit_price), 2) AS avg_unit_price,
+  SUM(quantity) AS order_volume
 FROM fact_transaction
 GROUP BY discount_perc
 ORDER BY discount_perc;
+
+
+
+
+
+
 
 ### 11. Return Rate by Product Category
 SELECT category,
@@ -281,9 +291,19 @@ ORDER BY total_profit DESC
 LIMIT 1;
 
 ### 13. % of High Priority Orders
+
 SELECT 
-  (SUM(CASE WHEN order_priority = 'High' THEN 1 ELSE 0 END) / COUNT(*)) * 100 AS high_priority_pct
+  ROUND(
+    (SUM(CASE 
+           WHEN LOWER(TRIM(REPLACE(REPLACE(order_priority, '\r', ''), '\n', ''))) = 'high' THEN 1 
+           ELSE 0 
+         END) / COUNT(*)) * 100, 2
+  ) AS high_priority_pct
 FROM fact_transaction;
+
+
+
+
 
 ### 14. Highest Revenue per Order by City
 SELECT city,
@@ -311,24 +331,38 @@ GROUP BY category, year
 ORDER BY category, year;
 
 ### 17. Products Frequently Purchased Together
+
+
 SELECT a.product_id AS product_a, b.product_id AS product_b, COUNT(*) AS times_bought_together
-FROM fact_transaction a
-JOIN fact_transaction b
+FROM (
+    SELECT DISTINCT order_id, product_id
+    FROM fact_transaction
+) a
+JOIN (
+    SELECT DISTINCT order_id, product_id
+    FROM fact_transaction
+) b
   ON a.order_id = b.order_id AND a.product_id < b.product_id
 GROUP BY product_a, product_b
-ORDER BY times_bought_together DESC
-LIMIT 10;
+ORDER BY times_bought_together DESC;
+
+
+
+
+
 
 ### 18. % of Orders with Multiple Products
 
 SELECT 
-  (COUNT(*) - COUNT(DISTINCT order_id)) / COUNT(*) * 100 AS multi_product_order_pct
+  ROUND(
+    (COUNT(CASE WHEN product_count > 1 THEN 1 END) / COUNT(*)) * 100, 2
+  ) AS multi_product_order_pct
 FROM (
   SELECT order_id, COUNT(DISTINCT product_id) AS product_count
   FROM fact_transaction
   GROUP BY order_id
-) t
-WHERE product_count > 1;
+) t;
+
 
 ### 19. Orders with Abnormally High Shipping Costs
 
